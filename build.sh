@@ -23,7 +23,6 @@ fi
 echo "builder: ${BUILDER_NAME}"
 docker buildx use "${BUILDER_NAME}"
 
-docker run --privileged multiarch/qemu-user-static:latest --reset -p yes --credential yes
 docker buildx build \
     $platform_and_push \
     --tag "${IMAGE_NAME}:${PYTHON_VERSION}" \
