@@ -14,22 +14,12 @@ if [ "${1}" = 'push' ]; then
     platform_and_push='--platform=linux/amd64,linux/arm64 --push'
 fi
 
-keep_builder="${BUILDER_NAME}"
-if [ -z "${BUILDER_NAME}" ]; then
-    echo '--- Creating new builder instance --'
-    docker context create circle || true
-    export BUILDER_NAME=$(docker buildx create circle)
-fi
-echo "builder: ${BUILDER_NAME}"
-docker buildx use "${BUILDER_NAME}"
+docker context create circle || true
+docker buildx create --name circle-builder circle || true
+docker buildx use circle-builder
 
 docker buildx build \
     $platform_and_push \
     --tag "${IMAGE_NAME}:${PYTHON_VERSION}" \
     --build-arg "ARG_PYTHON_VERSION=${PYTHON_VERSION}" \
     .
-
-if [ -z "${keep_builder}" ]; then
-    echo "--- Deleting temporary builder instance ${BUILDER_NAME} --"
-    docker buildx rm "${BUILDER_NAME}"
-fi
