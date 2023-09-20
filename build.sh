@@ -4,6 +4,8 @@ set -eo pipefail
 export PYTHON_VERSION='3.12.0rc3'
 export IMAGE_NAME='mr0grog/circle-python-pre'
 
+echo "DOCKER: $(which docker)"
+
 echo "=== Building Image for Python ${PYTHON_VERSION} ==="
 
 # Multi-platform builds must be pushed directly and are not support in local
