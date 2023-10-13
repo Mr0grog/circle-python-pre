@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-export PYTHON_VERSION='3.12.0'
+export PYTHON_VERSION='3.13.0a1'
 export IMAGE_NAME='mr0grog/circle-python-pre'
 
 echo "=== Building Image for Python ${PYTHON_VERSION} ==="
