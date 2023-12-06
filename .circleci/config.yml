@@ -1,0 +1,28 @@
+version: 2.1
+
+jobs:
+  smoke_test:
+    docker:
+      - image: mr0grog/circle-python-pre:3.13.0a2
+    steps:
+      - run:
+          name: Check Python Version
+          command: |
+            ACTUAL_VERSION="$(python --version)"
+            echo "'python --version' == '${ACTUAL_VERSION}'"
+            if [ "${ACTUAL_VERSION}" = 'Python 3.13.0a2' ]; then
+              true
+            else
+              echo 'Did not find expected Python version!'
+              false
+            fi
+
+      - run:
+          name: Upgrade Pip
+          command: |
+            pip install --upgrade pip
+
+workflows:
+  ci:
+    jobs:
+      - smoke_test
