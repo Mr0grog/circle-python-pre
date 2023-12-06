@@ -18,6 +18,18 @@ jobs:
             fi
 
       - run:
+          name: Run a Simple Python Script
+          command: |
+            OUTPUT="$(python -c 'print("Hello from Python")')"
+            echo "${OUTPUT}"
+            if [ "${OUTPUT}" = 'Hello from Python' ]; then
+              true
+            else
+              echo 'Did not get expected output!'
+              false
+            fi
+
+      - run:
           name: Upgrade Pip
           command: |
             pip install --upgrade pip
