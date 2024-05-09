@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   smoke_test:
     docker:
-      - image: mr0grog/circle-python-pre:3.13.0a6
+      - image: mr0grog/circle-python-pre:3.13.0b1
     steps:
       - run:
           name: Check Python Version
