@@ -10,7 +10,7 @@ jobs:
           command: |
             ACTUAL_VERSION="$(python --version)"
             echo "'python --version' == '${ACTUAL_VERSION}'"
-            if [ "${ACTUAL_VERSION}" = 'Python 3.13.0a6' ]; then
+            if [ "${ACTUAL_VERSION}" = 'Python 3.13.0b1' ]; then
               true
             else
               echo 'Did not find expected Python version!'
