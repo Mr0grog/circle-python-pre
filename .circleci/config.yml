@@ -49,8 +49,10 @@ jobs:
       - checkout
       - run:
           name: Build Docker Image
+          # Emulated multi-platform builds can be slow!
+          no_output_timeout: 45m
           command: |
-            docker run --rm --privileged multiarch/qemu-user-static:register --reset --credential yes
+            # docker run --rm --privileged multiarch/qemu-user-static:register --reset --credential yes
             ./build.sh
 
 workflows:
