@@ -19,7 +19,9 @@ echo "=== Building Image for Python ${PYTHON_VERSION} ==="
 #     echo '--- Building for multiple platforms and pushing to Docker Hub --'
 #     platform_and_push='--platform=linux/amd64,linux/arm64 --push'
 # fi
-PLATFORMS='linux/amd64,linux/arm64'
+
+# Disabled temporarily
+# PLATFORMS='--platform=linux/amd64,linux/arm64'
 
 docker context create circle || true
 docker context use circle
@@ -33,7 +35,7 @@ docker buildx use circle-builder
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes --credential yes
 
 docker buildx build \
-    --platform="${PLATFORMS}" \
+    # $PLATFORMS \
     --tag "${IMAGE_NAME}:${PYTHON_VERSION}" \
     --build-arg "ARG_PYTHON_VERSION=${PYTHON_VERSION}" \
     .
