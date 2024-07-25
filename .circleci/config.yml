@@ -2,8 +2,12 @@ version: 2.1
 
 jobs:
   smoke_test:
+    parameters:
+      image_tag:
+        description: 'Python image tag to test'
+        type: string
     docker:
-      - image: mr0grog/circle-python-pre:3.13.0b4
+      - image: "mr0grog/circle-python-pre:<< parameters.image_tag >>"
     steps:
       - run:
           name: Check Python Version
@@ -37,4 +41,7 @@ jobs:
 workflows:
   ci:
     jobs:
-      - smoke_test
+      - smoke_test:
+          matrix:
+            parameters:
+              image_tag: ["3.13.0b4", "3.13.0b4t"]
