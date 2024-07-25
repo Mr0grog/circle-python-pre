@@ -41,6 +41,18 @@ jobs:
           command: |
             pip install --upgrade pip
 
+  build:
+    machine:
+      image: ubuntu-2004:current
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run:
+          name: Build Docker Image
+          command: |
+            docker run --rm --privileged multiarch/qemu-user-static:register --reset --credential yes
+            ./build.sh
+
 workflows:
   ci:
     jobs:
@@ -51,3 +63,4 @@ workflows:
           name: smoke_test-freethreading
           image_tag: 3.13.0b4t
           version: 3.13.0b4
+      - build

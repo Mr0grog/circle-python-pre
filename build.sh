@@ -14,11 +14,12 @@ echo "=== Building Image for Python ${PYTHON_VERSION} ==="
 
 # Multi-platform builds must be pushed directly and are not supported in local
 # Docker. See https://github.com/docker/roadmap/issues/371
-platform_and_push='--load'
-if [ "${1}" = 'push' ]; then
-    echo '--- Building for multiple platforms and pushing to Docker Hub --'
-    platform_and_push='--platform=linux/amd64,linux/arm64 --push'
-fi
+# platform_and_push='--load'
+# if [ "${1}" = 'push' ]; then
+#     echo '--- Building for multiple platforms and pushing to Docker Hub --'
+#     platform_and_push='--platform=linux/amd64,linux/arm64 --push'
+# fi
+PLATFORMS='linux/amd64,linux/arm64'
 
 docker context create circle || true
 docker context use circle
@@ -32,7 +33,11 @@ docker buildx use circle-builder
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes --credential yes
 
 docker buildx build \
-    $platform_and_push \
+    --platform="${PLATFORMS}" \
     --tag "${IMAGE_NAME}:${PYTHON_VERSION}" \
     --build-arg "ARG_PYTHON_VERSION=${PYTHON_VERSION}" \
     .
+
+# Quick smoketest
+echo 'This should print "Hello from Python":'
+docker run --rm "${IMAGE_NAME}:${PYTHON_VERSION}" python -c 'print("Hello from Python")'
