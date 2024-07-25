@@ -6,6 +6,9 @@ jobs:
       image_tag:
         description: 'Python image tag to test'
         type: string
+      version:
+        description: 'Expected version of Python to be used'
+        type: string
     docker:
       - image: "mr0grog/circle-python-pre:<< parameters.image_tag >>"
     steps:
@@ -14,7 +17,7 @@ jobs:
           command: |
             ACTUAL_VERSION="$(python --version)"
             echo "'python --version' == '${ACTUAL_VERSION}'"
-            if [ "${ACTUAL_VERSION}" = 'Python 3.13.0b4' ]; then
+            if [ "${ACTUAL_VERSION}" = 'Python << parameters.version >>' ]; then
               true
             else
               echo 'Did not find expected Python version!'
@@ -42,6 +45,9 @@ workflows:
   ci:
     jobs:
       - smoke_test:
-          matrix:
-            parameters:
-              image_tag: ["3.13.0b4", "3.13.0b4t"]
+          image_tag: 3.13.0b4
+          version: 3.13.0b4
+      - smoke_test:
+          name: smoke_test-freethreading
+          image_tag: 3.13.0b4t
+          version: 3.13.0b4
