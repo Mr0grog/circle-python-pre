@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-export PYTHON_VERSION='3.13.0b4'
+export PYTHON_VERSION='3.13.0b4t'
 export IMAGE_NAME='mr0grog/circle-python-pre'
+
+# In CI, don't rewrite lines. We want a clean, complete log so we see things
+# printed by the image's RUN steps.
+if [ -n "${CI}" ]; then
+    export BUILDKIT_PROGRESS='plain'
+fi
 
 echo "=== Building Image for Python ${PYTHON_VERSION} ==="
 
-# Multi-platform builds must be pushed directly and are not support in local
+# Multi-platform builds must be pushed directly and are not supported in local
 # Docker. See https://github.com/docker/roadmap/issues/371
 platform_and_push='--load'
 if [ "${1}" = 'push' ]; then

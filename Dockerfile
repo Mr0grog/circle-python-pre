@@ -5,7 +5,7 @@
 # Care should be taken to keep this inline with that source file.
 # Tweaks here are marked with "# TWEAK:"
 
-FROM cimg/base:2023.07
+FROM cimg/base:2024.02
 
 # TWEAK: custom maintainer
 LABEL maintainer="Rob Brackett (https://github.com/Mr0grog)"
@@ -56,5 +56,14 @@ RUN python --version && \
 	# Install pipx
 	pip install --user pipx
 
+# TWEAK: Poetry relies on some Rust-based packages that do not yet have
+# appropriate wheels, so we need to install Rust first.
+# RUN sudo apt-get update && sudo apt-get install cargo
+
+# TWEAK: Install preview version of Poetry and allow installation to fail with
+#   a warning. Poetry has many dependencies; some aren't always compatible with
+#   prerelease Pythons.
+#
 # This installs version poetry at the latest version. poetry is updated about twice a month.
-RUN curl -sSL https://install.python-poetry.org | python -
+RUN curl -sSL https://install.python-poetry.org | python - --preview \
+  || echo 'WARNING: Poetry not installable!'
