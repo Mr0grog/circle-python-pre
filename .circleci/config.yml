@@ -92,9 +92,9 @@ jobs:
       - run:
           command: |
             if [ -n '<< parameters.publish >>' ]; then
-              export IMAGE_NAME='<< parameters.publish >>'
+              echo 'export IMAGE_NAME="<< parameters.publish >>"' >> "$BASH_ENV"
             else
-              export IMAGE_NAME='test/circle-python-pre:<< parameters.version >>'
+              echo 'export IMAGE_NAME="test/circle-python-pre:<< parameters.version >>"' >> "$BASH_ENV"
             fi
       - run:
           name: Build Preview
