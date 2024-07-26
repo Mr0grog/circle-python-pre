@@ -64,5 +64,6 @@ RUN python --version && \
 #   dependencies; some aren't always compatible with prerelease Pythons.
 #
 # This installs version poetry at the latest version. poetry is updated about twice a month.
-RUN PIP_VERBOSE=2 curl -sSL https://install.python-poetry.org | PIP_VERBOSE=2 python - --yes \
-  || echo 'WARNING: Poetry not installable!'
+# RUN PIP_VERBOSE=2 curl -sSL https://install.python-poetry.org | PIP_VERBOSE=2 python - --yes \
+#   || echo 'WARNING: Poetry not installable!'
+RUN pipx install -vvv poetry || echo 'WARNING: Poetry not installable!'
