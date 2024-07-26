@@ -14,8 +14,8 @@ while (( "$#" )); do
         --publish)
             if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
                 PUBLISH="${2}"
-                if [ "${PUBLISH}" != *":"* ]; then
-                    echo '--publish value must be formatted like "NAME:TAG"'
+                if [[ "${PUBLISH}" != *":"* ]]; then
+                    echo "--publish value must be formatted like "NAME:TAG" (not '${PUBLISH}')"
                     exit 1
                 fi
                 shift 2
@@ -50,13 +50,13 @@ fi
 #     export PLATFORM='linux/amd64,linux/arm64'
 # fi
 
-echo "OPTIONS:"
-echo "  PYTHON_VERSION: '${PYTHON_VERSION}'"
-echo "  PLATFORM: '${PLATFORM}'"
-echo "  IMAGE_NAME: '${IMAGE_NAME}'"
-echo "  IMAGE_FULL_NAME: '${IMAGE_FULL_NAME}'"
-echo "  PUBLISH: '${PUBLISH}'"
-exit 0
+# echo "OPTIONS:"
+# echo "  PYTHON_VERSION: '${PYTHON_VERSION}'"
+# echo "  PLATFORM: '${PLATFORM}'"
+# echo "  IMAGE_NAME: '${IMAGE_NAME}'"
+# echo "  IMAGE_FULL_NAME: '${IMAGE_FULL_NAME}'"
+# echo "  PUBLISH: '${PUBLISH}'"
+# exit 0
 
 # In CI, don't rewrite lines. We want a clean, complete log so we see things
 # printed by the image's RUN steps.
