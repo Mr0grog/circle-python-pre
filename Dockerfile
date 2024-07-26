@@ -67,5 +67,5 @@ RUN python --version && \
 #     builds.
 #
 # This installs version poetry at the latest version. poetry is updated about twice a month.
-RUN curl -sSL https://install.python-poetry.org | python - \
-  || echo 'WARNING: Poetry not installable!'
+# RUN curl -sSL https://install.python-poetry.org | python - \
+#   || echo 'WARNING: Poetry not installable!'
