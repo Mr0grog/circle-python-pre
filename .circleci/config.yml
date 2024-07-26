@@ -58,11 +58,12 @@ jobs:
 workflows:
   ci:
     jobs:
-      - smoke_test:
-          image_tag: 3.13.0b4
-          version: 3.13.0b4
-      - smoke_test:
-          name: smoke_test-freethreading
-          image_tag: 3.13.0b4t
-          version: 3.13.0b4
+      # TEMPORARILY DISABLED
+      # - smoke_test:
+      #     image_tag: 3.13.0b4
+      #     version: 3.13.0b4
+      # - smoke_test:
+      #     name: smoke_test-freethreading
+      #     image_tag: 3.13.0b4t
+      #     version: 3.13.0b4
       - build

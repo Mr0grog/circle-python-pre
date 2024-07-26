@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-export PYTHON_VERSION='3.13.0b4t'
+export PYTHON_VERSION='3.13.0b4'
+export PYTHON_BUILD='3.13.0b4t'
 export IMAGE_NAME='mr0grog/circle-python-pre'
 
 # In CI, don't rewrite lines. We want a clean, complete log so we see things
@@ -10,7 +11,7 @@ if [ -n "${CI}" ]; then
     export BUILDKIT_PROGRESS='plain'
 fi
 
-echo "=== Building Image for Python ${PYTHON_VERSION} ==="
+echo "=== Building Image for Python ${PYTHON_BUILD} ==="
 
 # Multi-platform builds must be pushed directly and are not supported in local
 # Docker. See https://github.com/docker/roadmap/issues/371
@@ -22,10 +23,11 @@ echo "=== Building Image for Python ${PYTHON_VERSION} ==="
 
 # Disabled temporarily
 # PLATFORMS='--platform=linux/amd64,linux/arm64'
+PLATFORMS=''
 
 docker context create circle || true
 docker context use circle
-docker buildx create --name circle-builder circle || true
+docker buildx create --name circle-builder --driver docker-container circle || true
 docker buildx use circle-builder
 
 # Enable `sudo` to work inside a multi-architecture Docker build. See:
@@ -35,11 +37,24 @@ docker buildx use circle-builder
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes --credential yes
 
 docker buildx build \
-    # $PLATFORMS \
-    --tag "${IMAGE_NAME}:${PYTHON_VERSION}" \
-    --build-arg "ARG_PYTHON_VERSION=${PYTHON_VERSION}" \
+    $PLATFORMS \
+    --tag "${IMAGE_NAME}:${PYTHON_BUILD}" \
+    --build-arg "ARG_PYTHON_VERSION=${PYTHON_BUILD}" \
     .
 
-# Quick smoketest
-echo 'This should print "Hello from Python":'
-docker run --rm "${IMAGE_NAME}:${PYTHON_VERSION}" python -c 'print("Hello from Python")'
+echo "=== Testing Image ==="
+
+ACTUAL_VERSION="$(docker run --rm "${IMAGE_NAME}:${PYTHON_BUILD}" python --version)"
+echo "'python --version' > '${ACTUAL_VERSION}'"
+if [ "${ACTUAL_VERSION}" != "Python ${PYTHON_VERSION}" ]; then
+    echo "Did not find expected Python version (${PYTHON_VERSION})!"
+    exit 1
+fi
+
+EXPECTED_OUTPUT='Hello from Python'
+ACTUAL_OUTPUT="$(docker run --rm "${IMAGE_NAME}:${PYTHON_BUILD}" python -c "print('${EXPECTED_OUTPUT}')")"
+echo "Python output: '${ACTUAL_OUTPUT}'"
+if [ "${ACTUAL_OUTPUT}" != "${EXPECTED_OUTPUT}" ]; then
+    echo 'Did not get expected output!'
+    exit 1
+fi
