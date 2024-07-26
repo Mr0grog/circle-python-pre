@@ -48,6 +48,13 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Set up containerd storage
+          command: |
+            sudo cp docker-daemon-config.json /etc/docker/daemon.json
+            sudo systemctl restart docker
+            echo 'Docker Driver:'
+            docker info -f '{{ .DriverStatus }}'
+      - run:
           name: Build Docker Image
           command: |
             ./build.sh 3.13.0b4
@@ -58,6 +65,13 @@ jobs:
       docker_layer_caching: true
     steps:
       - checkout
+      - run:
+          name: Set up containerd storage
+          command: |
+            sudo cp docker-daemon-config.json /etc/docker/daemon.json
+            sudo systemctl restart docker
+            echo 'Docker Driver:'
+            docker info -f '{{ .DriverStatus }}'
       - run:
           name: Docker Login
           command: docker login -u $DOCKER_TEST_USERNAME -p $DOCKER_TEST_TOKEN
