@@ -41,7 +41,6 @@ echo "  PYTHON_VERSION: '${PYTHON_VERSION}'"
 echo "  IMAGE_FULL_NAME: '${IMAGE_FULL_NAME}'"
 echo "  PLATFORM: '${PLATFORM}'"
 echo "  FLAGS: '${FLAGS}'"
-exit 0
 
 # In CI, don't rewrite lines. We want a clean, complete log so we see things
 # printed by the image's RUN steps.
