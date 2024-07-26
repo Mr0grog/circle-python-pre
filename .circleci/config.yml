@@ -41,48 +41,48 @@ jobs:
           command: |
             pip install --upgrade pip
 
-  build_single_platform:
+  build_and_test:
+    parameters:
+      version:
+        description: 'Version of Python to build an image for'
+        type: string
+      multiplatform:
+        description: 'Whether to build for multiple platforms'
+        type: boolean
+        default: false
+      publish:
+        description: 'If set, publish the image under this name'
+        type: string
+        default: ''
     machine:
       image: ubuntu-2004:current
       docker_layer_caching: true
     steps:
       - checkout
       - run:
-          name: Set up containerd storage
+          name: Set up Docker containerd storage (required for multiplatform)
           command: |
             sudo cp docker-daemon-config.json /etc/docker/daemon.json
             sudo systemctl restart docker
             echo 'Docker Driver:'
             docker info -f '{{ .DriverStatus }}'
-      - run:
-          name: Build Docker Image
-          command: |
-            ./build.sh 3.13.0b4
-
-  build_multiplatform:
-    machine:
-      image: ubuntu-2004:current
-      docker_layer_caching: true
-    steps:
-      - checkout
-      - run:
-          name: Set up containerd storage
-          command: |
-            sudo cp docker-daemon-config.json /etc/docker/daemon.json
-            sudo systemctl restart docker
-            echo 'Docker Driver:'
-            docker info -f '{{ .DriverStatus }}'
-      - run:
-          name: Docker Login
-          command: docker login -u $DOCKER_TEST_USERNAME -p $DOCKER_TEST_TOKEN
+      - when:
+          condition: << parameters.publish >>
+          steps:
+            - run:
+                name: Docker Login
+                command: docker login -u $DOCKER_TEST_USERNAME -p $DOCKER_TEST_TOKEN
       - run:
           name: Build and Publish Docker Image
           # Emulated multi-platform builds can be slow!
-          no_output_timeout: 45m
+          no_output_timeout: 60m
           command: |
-            ./build.sh 3.13.0b4 \
-              --multiplatform \
-              --publish 'mr0grog/circle-python-pre-test:preview--<< pipeline.git.branch >>'
+            PLATFORM_OPTION="$([[ '<< parameters.multiplatform >>' == 'true' ]] && echo '--multiplatform' || true)"
+            PUBLISH_OPTION="$([ -n '<< parameters.publish >>' ] && echo '--publish "<< parameters.publish >>"' || true)"
+
+            echo "Running: ./build.sh << parameters.version >> $PLATFORM_OPTION $PUBLISH_OPTION"
+            echo "----------------"
+            ./build.sh << parameters.version >> $PLATFORM_OPTION $PUBLISH_OPTION
 
 workflows:
   ci:
@@ -95,16 +95,22 @@ workflows:
       #     name: smoke_test-freethreading
       #     image: 'mr0grog/circle-python-pre:3.13.0b4t'
       #     version: 3.13.0b4
-      - build_single_platform
-      - approve_for_full_build_and_test:
+      - build_and_test:
+          name: build_and_test_basic
+          version: 3.13.0b4
+      - allow_full_build:
           type: approval
           requires:
-            - build_single_platform
-      - build_multiplatform:
+            - build_and_test_basic
+      - build_and_test:
+          name: build_and_test_full
+          version: 3.13.0b4
+          multiplatform: true
+          publish: 'mr0grog/circle-python-pre-test:preview--<< pipeline.git.branch >>'
           requires:
-            - approve_for_full_build_and_test
+            - allow_full_build
       - smoke_test:
           image: 'mr0grog/circle-python-pre-test:preview--<< pipeline.git.branch >>'
           version: 3.13.0b4
           requires:
-            - build_multiplatform
+            - build_and_test_full

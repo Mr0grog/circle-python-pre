@@ -71,12 +71,14 @@ docker context use circle
 docker buildx create --name circle-builder --driver docker-container circle || true
 docker buildx use circle-builder
 
+echo 'Setting up QEMU...'
 # Enable `sudo` to work inside a multi-architecture Docker build. See:
 #   https://github.com/docker/buildx/issues/1335
 #   https://github.com/multiarch/alpine/issues/32#issuecomment-604521491
 #   https://github.com/multiarch/qemu-user-static/issues/17
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes --credential yes
 
+echo 'Building...'
 docker buildx build \
     --platform="${PLATFORM}" \
     --tag "${IMAGE_FULL_NAME}" \
