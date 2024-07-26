@@ -54,6 +54,10 @@ jobs:
         description: 'If set, publish the image under this name'
         type: string
         default: ''
+      python_build_flags:
+        description: 'Additional build flags to set'
+        type: string
+        default: ''
     machine:
       image: ubuntu-2004:current
       docker_layer_caching: true
@@ -66,23 +70,64 @@ jobs:
             sudo systemctl restart docker
             echo 'Docker Driver:'
             docker info -f '{{ .DriverStatus }}'
+
+      # - when:
+      #     condition: << parameters.publish >>
+      #     steps:
+      #       - run:
+      #           name: Docker Login
+      #           command: docker login -u $DOCKER_TEST_USERNAME -p $DOCKER_TEST_TOKEN
+      # - run:
+      #     name: Build and Publish Docker Image
+      #     # Emulated multi-platform builds can be slow!
+      #     no_output_timeout: 60m
+      #     command: |
+      #       PLATFORM_OPTION="$([[ '<< parameters.multiplatform >>' == 'true' ]] && echo '--multiplatform' || true)"
+      #       PUBLISH_OPTION="$([ -n '<< parameters.publish >>' ] && echo '--publish "<< parameters.publish >>"' || true)"
+
+      #       echo "Running: ./build.sh << parameters.version >> $PLATFORM_OPTION $PUBLISH_OPTION"
+      #       echo "----------------"
+      #       ./build.sh << parameters.version >> $PLATFORM_OPTION $PUBLISH_OPTION
+
+      - run:
+          command: |
+            if [ -n '<< parameters.publish >>' ]; then
+              export IMAGE_NAME='<< parameters.publish >>'
+            else
+              export IMAGE_NAME='test/circle-python-pre:<< parameters.version >>'
+            fi
+      - run:
+          name: Build Preview
+          # Emulated multi-platform builds can be slow!
+          no_output_timeout: 60m
+          command: |
+            PLATFORM_OPTION="$([[ '<< parameters.multiplatform >>' == 'true' ]] && echo 'multiplatform' || echo 'local')"
+            echo "./build-image.sh '<< parameters.version >>' '${PLATFORM_OPTION}' '<< parameters.python_build_flags >>' '${IMAGE_NAME}'"
+      - run:
+          name: Build Image
+          # Emulated multi-platform builds can be slow!
+          no_output_timeout: 60m
+          command: |
+            PLATFORM_OPTION="$([[ '<< parameters.multiplatform >>' == 'true' ]] && echo 'multiplatform' || echo 'local')"
+            ./build-image.sh \
+              '<< parameters.version >>' \
+              "${PLATFORM_OPTION}" \
+              '<< parameters.python_build_flags >>' \
+              "${IMAGE_NAME}"
+      - run:
+          name: Test Image
+          command: |
+            ./smoke-test.sh '<< parameters.version >>' "${IMAGE_NAME}"
       - when:
           condition: << parameters.publish >>
           steps:
             - run:
                 name: Docker Login
                 command: docker login -u $DOCKER_TEST_USERNAME -p $DOCKER_TEST_TOKEN
-      - run:
-          name: Build and Publish Docker Image
-          # Emulated multi-platform builds can be slow!
-          no_output_timeout: 60m
-          command: |
-            PLATFORM_OPTION="$([[ '<< parameters.multiplatform >>' == 'true' ]] && echo '--multiplatform' || true)"
-            PUBLISH_OPTION="$([ -n '<< parameters.publish >>' ] && echo '--publish "<< parameters.publish >>"' || true)"
-
-            echo "Running: ./build.sh << parameters.version >> $PLATFORM_OPTION $PUBLISH_OPTION"
-            echo "----------------"
-            ./build.sh << parameters.version >> $PLATFORM_OPTION $PUBLISH_OPTION
+            - run:
+                name: Publish Image to Docker Hub
+                command: |
+                  docker push '<< parameters.publish >>'
 
 workflows:
   ci:

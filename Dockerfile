@@ -43,8 +43,9 @@ RUN sudo apt-get update && sudo apt-get install -y \
 	sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # TWEAK: use $PYTHON_VERSION here
-RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install $PYTHON_VERSION && pyenv global $PYTHON_VERSION
-# RUN env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install $PYTHON_VERSION && pyenv global $PYTHON_VERSION
+# TWEAK: set '--enable-optimizations' via ARG_PYTHON_FLAGS instead of hardcoding
+ARG ARG_PYTHON_FLAGS=''
+RUN env PYTHON_CONFIGURE_OPTS="--enable-shared $ARG_PYTHON_FLAGS" pyenv install $PYTHON_VERSION && pyenv global $PYTHON_VERSION
 
 RUN python --version && \
 	pip --version && \
