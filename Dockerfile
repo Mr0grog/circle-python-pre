@@ -60,10 +60,9 @@ RUN python --version && \
 # appropriate wheels, so we need to install Rust first.
 # RUN sudo apt-get update && sudo apt-get install cargo
 
-# TWEAK: Install preview version of Poetry and allow installation to fail with
-#   a warning. Poetry has many dependencies; some aren't always compatible with
-#   prerelease Pythons.
+# TWEAK: Allow Poetry installation to fail with a warning. Poetry has many
+#   dependencies; some aren't always compatible with prerelease Pythons.
 #
 # This installs version poetry at the latest version. poetry is updated about twice a month.
-RUN curl -sSL https://install.python-poetry.org | python - --preview \
+RUN curl -sSL https://install.python-poetry.org | python - \
   || echo 'WARNING: Poetry not installable!'
