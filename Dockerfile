@@ -43,8 +43,8 @@ RUN sudo apt-get update && sudo apt-get install -y \
 	sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # TWEAK: use $PYTHON_VERSION here
-# RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install $PYTHON_VERSION && pyenv global $PYTHON_VERSION
-RUN env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install $PYTHON_VERSION && pyenv global $PYTHON_VERSION
+RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install $PYTHON_VERSION && pyenv global $PYTHON_VERSION
+# RUN env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install $PYTHON_VERSION && pyenv global $PYTHON_VERSION
 
 RUN python --version && \
 	pip --version && \
@@ -62,8 +62,10 @@ RUN python --version && \
 
 # TWEAK: Allow Poetry installation to fail with a warning. Poetry has many
 #   dependencies; some aren't always compatible with prerelease Pythons.
+#   ^ The above also makes this step pretty slow when it is successful, since
+#     many deps don't have wheels for a prerelease Python and need from-scratch
+#     builds.
 #
 # This installs version poetry at the latest version. poetry is updated about twice a month.
-# RUN PIP_VERBOSE=2 curl -sSL https://install.python-poetry.org | PIP_VERBOSE=2 python - --yes \
-#   || echo 'WARNING: Poetry not installable!'
-RUN pipx install -vvv poetry || echo 'WARNING: Poetry not installable!'
+RUN curl -sSL https://install.python-poetry.org | python - \
+  || echo 'WARNING: Poetry not installable!'
