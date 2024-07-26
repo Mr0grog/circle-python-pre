@@ -30,9 +30,15 @@ if [[ -n "${3}" ]] && [[ "${3}" != "noflags" ]]; then
     FLAGS="${3}"
 fi
 
+if [ -n "${4}" ]; then
+    IMAGE_FULL_NAME="${4}"
+else
+    IMAGE_FULL_NAME="${IMAGE_NAME}:${PYTHON_VERSION}"
+fi
+
 echo "Options:"
 echo "  PYTHON_VERSION: '${PYTHON_VERSION}'"
-echo "  IMAGE_NAME: '${IMAGE_NAME}'"
+echo "  IMAGE_FULL_NAME: '${IMAGE_FULL_NAME}'"
 echo "  PLATFORM: '${PLATFORM}'"
 echo "  FLAGS: '${FLAGS}'"
 exit 0
