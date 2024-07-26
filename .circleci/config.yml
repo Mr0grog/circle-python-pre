@@ -50,7 +50,7 @@ jobs:
       - run:
           name: Build Docker Image
           command: |
-            ./build.sh
+            ./build.sh 3.13.0b4
 
   build_multiplatform:
     machine:
@@ -66,8 +66,7 @@ jobs:
           # Emulated multi-platform builds can be slow!
           no_output_timeout: 45m
           command: |
-            ./build.sh \
-              3.13.0b4 \
+            ./build.sh 3.13.0b4 \
               --multiplatform \
               --publish 'mr0grog/circle-python-pre-test:preview--<< pipeline.git.branch >>'
 
