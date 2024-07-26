@@ -1,9 +1,62 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-export PYTHON_VERSION='3.13.0b4'
-export PYTHON_BUILD='3.13.0b4t'
-export IMAGE_NAME='mr0grog/circle-python-pre'
+IMAGE_NAME='mr0grog/circle-python-pre'
+PLATFORM='local'
+PUBLISH=''
+
+while (( "$#" )); do
+    case "$1" in
+        --multiplatform)
+            PLATFORM='linux/amd64,linux/arm64'
+            shift
+            ;;
+        --publish)
+            if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+                PUBLISH="${2}"
+                if [ "${PUBLISH}" != *":"* ]; then
+                    echo '--publish value must be formatted like "NAME:TAG"'
+                    exit 1
+                fi
+                shift 2
+            else
+                PUBLISH="yes"
+                shift
+            fi
+            ;;
+        -*|--*=) # unsupported flags
+            echo "Error: Unsupported flag '${1}'" >&2
+            exit 1
+            ;;
+        *) # preserve positional arguments
+            PARAMS="$PARAMS $1"
+            shift
+            ;;
+    esac
+done
+# Reset args to just the positionals.
+eval set -- "$PARAMS"
+
+PYTHON_VERSION="${1}"
+IMAGE_NAME='mr0grog/circle-python-pre'
+IMAGE_FULL_NAME="${IMAGE_NAME}:${PYTHON_VERSION}"
+
+if [ "${PUBLISH}" == "yes" ]; then
+    PUBLISH="${IMAGE_FULL_NAME}"
+fi
+
+# # El-cheapo arg reading. Should really be a loop and a case.
+# if [[ $@ == *'--multiplatform'* ]]; then
+#     export PLATFORM='linux/amd64,linux/arm64'
+# fi
+
+echo "OPTIONS:"
+echo "  PYTHON_VERSION: '${PYTHON_VERSION}'"
+echo "  PLATFORM: '${PLATFORM}'"
+echo "  IMAGE_NAME: '${IMAGE_NAME}'"
+echo "  IMAGE_FULL_NAME: '${IMAGE_FULL_NAME}'"
+echo "  PUBLISH: '${PUBLISH}'"
+exit 0
 
 # In CI, don't rewrite lines. We want a clean, complete log so we see things
 # printed by the image's RUN steps.
@@ -11,19 +64,7 @@ if [ -n "${CI}" ]; then
     export BUILDKIT_PROGRESS='plain'
 fi
 
-echo "=== Building Image for Python ${PYTHON_BUILD} ==="
-
-# Multi-platform builds must be pushed directly and are not supported in local
-# Docker. See https://github.com/docker/roadmap/issues/371
-# platform_and_push='--load'
-# if [ "${1}" = 'push' ]; then
-#     echo '--- Building for multiple platforms and pushing to Docker Hub --'
-#     platform_and_push='--platform=linux/amd64,linux/arm64 --push'
-# fi
-
-# Disabled temporarily
-# PLATFORMS='--platform=linux/amd64,linux/arm64'
-PLATFORMS=''
+echo "=== Building Image for Python ${PYTHON_VERSION} ==="
 
 docker context create circle || true
 docker context use circle
@@ -37,24 +78,38 @@ docker buildx use circle-builder
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes --credential yes
 
 docker buildx build \
-    $PLATFORMS \
-    --tag "${IMAGE_NAME}:${PYTHON_BUILD}" \
-    --build-arg "ARG_PYTHON_VERSION=${PYTHON_BUILD}" \
+    --platform="${PLATFORM}" \
+    --tag "${IMAGE_FULL_NAME}" \
+    --build-arg "ARG_PYTHON_VERSION=${PYTHON_VERSION}" \
+    --load \
     .
 
+echo ""
 echo "=== Testing Image ==="
 
-ACTUAL_VERSION="$(docker run --rm "${IMAGE_NAME}:${PYTHON_BUILD}" python --version)"
+# The "t" suffix (e.g. "3.130b4t") indicates this is the the given version with
+# free-threading (no GIL) turned on. The actual version of Python it represents
+# is the build version without the suffix (e.g. "3.13.0b4").
+EXPECTED_VERSION="${PYTHON_VERSION%t}"
+ACTUAL_VERSION="$(docker run --rm "${IMAGE_FULL_NAME}" python --version)"
 echo "'python --version' > '${ACTUAL_VERSION}'"
-if [ "${ACTUAL_VERSION}" != "Python ${PYTHON_VERSION}" ]; then
-    echo "Did not find expected Python version (${PYTHON_VERSION})!"
+if [ "${ACTUAL_VERSION}" != "Python ${EXPECTED_VERSION}" ]; then
+    echo "Did not find expected Python version (${EXPECTED_VERSION})!"
     exit 1
 fi
 
 EXPECTED_OUTPUT='Hello from Python'
-ACTUAL_OUTPUT="$(docker run --rm "${IMAGE_NAME}:${PYTHON_BUILD}" python -c "print('${EXPECTED_OUTPUT}')")"
+ACTUAL_OUTPUT="$(docker run --rm "${IMAGE_FULL_NAME}" python -c "print('${EXPECTED_OUTPUT}')")"
 echo "Python output: '${ACTUAL_OUTPUT}'"
 if [ "${ACTUAL_OUTPUT}" != "${EXPECTED_OUTPUT}" ]; then
     echo 'Did not get expected output!'
     exit 1
+fi
+
+if [ -n "${PUBLISH}" ]; then
+    echo ""
+    echo "=== Publishing Image '${PUBLISH}' ==="
+
+    docker image tag "${IMAGE_FULL_NAME}" "${PUBLISH}"
+    docker push "${PUBLISH}"
 fi

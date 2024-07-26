@@ -3,14 +3,14 @@ version: 2.1
 jobs:
   smoke_test:
     parameters:
-      image_tag:
-        description: 'Python image tag to test'
+      image:
+        description: 'Docker image to test'
         type: string
       version:
         description: 'Expected version of Python to be used'
         type: string
     docker:
-      - image: "mr0grog/circle-python-pre:<< parameters.image_tag >>"
+      - image: "<< parameters.image >>"
     steps:
       - run:
           name: Check Python Version
@@ -41,7 +41,7 @@ jobs:
           command: |
             pip install --upgrade pip
 
-  build:
+  build_single_platform:
     machine:
       image: ubuntu-2004:current
       docker_layer_caching: true
@@ -49,21 +49,49 @@ jobs:
       - checkout
       - run:
           name: Build Docker Image
+          command: |
+            ./build.sh
+
+  build_multiplatform:
+    machine:
+      image: ubuntu-2004:current
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - run:
+          name: Docker Login
+          command: docker login -u $DOCKER_TEST_USERNAME -p $DOCKER_TEST_TOKEN
+      - run:
+          name: Build and Publish Docker Image
           # Emulated multi-platform builds can be slow!
           no_output_timeout: 45m
           command: |
-            # docker run --rm --privileged multiarch/qemu-user-static:register --reset --credential yes
-            ./build.sh
+            ./build.sh \
+              3.13.0b4 \
+              --multiplatform \
+              --publish 'mr0grog/circle-python-pre-test:preview--<< pipeline.git.branch >>'
 
 workflows:
   ci:
     jobs:
       # TEMPORARILY DISABLED
       # - smoke_test:
-      #     image_tag: 3.13.0b4
+      #     image: 'mr0grog/circle-python-pre:3.13.0b4'
       #     version: 3.13.0b4
       # - smoke_test:
       #     name: smoke_test-freethreading
-      #     image_tag: 3.13.0b4t
+      #     image: 'mr0grog/circle-python-pre:3.13.0b4t'
       #     version: 3.13.0b4
-      - build
+      - build_single_platform
+      - approve_for_full_build_and_test:
+          type: approval
+          requires:
+            - build_single_platform
+      - build_multiplatform:
+          requires:
+            - approve_for_full_build_and_test
+      - smoke_test:
+          image: 'mr0grog/circle-python-pre-test:preview--<< pipeline.git.branch >>'
+          version: 3.13.0b4
+          requires:
+            - build_multiplatform
