@@ -3,38 +3,18 @@ version: 2.1
 jobs:
   smoke_test:
     parameters:
-      image_tag:
-        description: 'Python image tag to test'
-        type: string
       version:
         description: 'Expected version of Python to be used'
         type: string
     docker:
-      - image: "mr0grog/circle-python-pre:<< parameters.image_tag >>"
+      - image: "mr0grog/circle-python-pre:<< parameters.version >>"
     steps:
-      - run:
-          name: Check Python Version
-          command: |
-            ACTUAL_VERSION="$(python --version)"
-            echo "'python --version' == '${ACTUAL_VERSION}'"
-            if [ "${ACTUAL_VERSION}" = 'Python << parameters.version >>' ]; then
-              true
-            else
-              echo 'Did not find expected Python version!'
-              false
-            fi
+      - checkout
 
       - run:
-          name: Run a Simple Python Script
+          name: Run Test
           command: |
-            OUTPUT="$(python -c 'print("Hello from Python")')"
-            echo "${OUTPUT}"
-            if [ "${OUTPUT}" = 'Hello from Python' ]; then
-              true
-            else
-              echo 'Did not get expected output!'
-              false
-            fi
+            ./smoke-test.sh '<< parameters.version >>'
 
       - run:
           name: Upgrade Pip
@@ -45,9 +25,7 @@ workflows:
   ci:
     jobs:
       - smoke_test:
-          image_tag: 3.13.0b4
-          version: 3.13.0b4
+          version: 3.13.0rc1
       - smoke_test:
           name: smoke_test-freethreading
-          image_tag: 3.13.0b4t
-          version: 3.13.0b4
+          version: 3.13.0rc1t
