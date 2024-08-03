@@ -67,3 +67,6 @@ RUN python --version && \
 # This installs version poetry at the latest version. poetry is updated about twice a month.
 RUN curl -sSL https://install.python-poetry.org | python - --preview \
   || echo 'WARNING: Poetry not installable!'
+
+# TWEAK: Circle's checkout step requires the project directory to be empty.
+RUN mv /home/circleci/project/poetry-installer-error*.log /home/circleci/ || true
