@@ -12,6 +12,9 @@ name: Build and Push
 
 jobs:
   build:
+    strategy:
+      matrix:
+        version: ["3.13.0rc1", "3.13.0rc1t"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,4 +33,8 @@ jobs:
           #   https://github.com/multiarch/qemu-user-static/issues/17
           docker run --rm --privileged multiarch/qemu-user-static:register --reset --credential yes
           # Actual build script.
-          ./build.sh push
+          ./build.sh ${{ matrix.version }} push
+
+      - name: Smoke Test
+        run: |
+          ./smoke-test.sh ${{ matrix.version }} 'mr0grog/circle-python-pre:${{ matrix.version }}'
