@@ -17,6 +17,7 @@ CircleCI doesn't make official `cimg/python` images available for Python pre-rel
     - 3.13.0b3
     - 3.13.0b4, 3.13.0b4t (`t` is [“free-threading,” or no GIL](https://py-free-threading.github.io). This image does not have Poetry, since it does not yet support free-threaded Python.)
     - 3.13.0rc1, 3.13.0rc1t (`t` is [“free-threading,” or no GIL](https://py-free-threading.github.io). The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
+    - 3.13.0rc2, 3.13.0rc2t (`t` is [“free-threading,” or no GIL](https://py-free-threading.github.io). The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
 
 This is pretty much a copy of the official CircleCI image with some small tweaks. CircleCI's source can be found at: https://github.com/CircleCI-Public/cimg-python/
 
@@ -33,7 +34,7 @@ version: 2.1
 jobs:
   test:
     docker:
-      - image: mr0grog/circle-python-pre:3.13.0rc1
+      - image: mr0grog/circle-python-pre:3.13.0rc2
     steps:
       - checkout
       - run:
