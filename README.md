@@ -1,6 +1,6 @@
 # Docker Images for Python 3.x pre-releaes on CircleCI
 
-CircleCI doesn't make official `cimg/python` images available for Python pre-releases, so this does. The goal is to make it straightforward to test projects on the beta or release candidate versions of upcoming major Python releases. Available Python versions:
+CircleCI doesn't make official `cimg/python` images available for Python pre-releases, so this does. The goal is to make it straightforward to test projects on the beta or release candidate versions of upcoming major Python releases. Available Python versions (versions suffixed with `t` are [“free-threading,” or no GIL](https://py-free-threading.github.io), a new feature in 3.13.0+):
 
 - 3.12.0:
     - 3.12.0rc3
@@ -15,10 +15,11 @@ CircleCI doesn't make official `cimg/python` images available for Python pre-rel
     - 3.13.0b1
     - 3.13.0b2
     - 3.13.0b3
-    - 3.13.0b4, 3.13.0b4t (`t` is [“free-threading,” or no GIL](https://py-free-threading.github.io). This image does not have Poetry, since it does not yet support free-threaded Python.)
-    - 3.13.0rc1, 3.13.0rc1t (`t` is [“free-threading,” or no GIL](https://py-free-threading.github.io). The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
-    - 3.13.0rc2, 3.13.0rc2t (`t` is [“free-threading,” or no GIL](https://py-free-threading.github.io). The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
-    - 3.13.0rc3, 3.13.0rc3t (`t` is [“free-threading,” or no GIL](https://py-free-threading.github.io). The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
+    - 3.13.0b4, 3.13.0b4t (The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
+    - 3.13.0rc1, 3.13.0rc1t (The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
+    - 3.13.0rc2, 3.13.0rc2t (The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
+    - 3.13.0rc3, 3.13.0rc3t (The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
+    - 3.13.0, 3.13.0t (production release) (The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
 
 This is pretty much a copy of the official CircleCI image with some small tweaks. CircleCI's source can be found at: https://github.com/CircleCI-Public/cimg-python/
 
@@ -35,7 +36,7 @@ version: 2.1
 jobs:
   test:
     docker:
-      - image: mr0grog/circle-python-pre:3.13.0rc3
+      - image: mr0grog/circle-python-pre:3.13.0
     steps:
       - checkout
       - run:
