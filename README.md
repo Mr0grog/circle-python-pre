@@ -15,17 +15,17 @@ CircleCI doesn't make official `cimg/python` images available for Python pre-rel
     - 3.13.0b1
     - 3.13.0b2
     - 3.13.0b3
-    - 3.13.0b4, 3.13.0b4t (The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
-    - 3.13.0rc1, 3.13.0rc1t (The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
-    - 3.13.0rc2, 3.13.0rc2t (The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
-    - 3.13.0rc3, 3.13.0rc3t (The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
-    - 3.13.0, 3.13.0t (production release) (The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
+    - 3.13.0b4, 3.13.0b4t (The `t` image does not have Poetry.)
+    - 3.13.0rc1, 3.13.0rc1t (The `t` image does not have Poetry.)
+    - 3.13.0rc2, 3.13.0rc2t (The `t` image does not have Poetry.)
+    - 3.13.0rc3, 3.13.0rc3t (The `t` image does not have Poetry.)
+    - 3.13.0, 3.13.0t (production release) (The `t` image does not have Poetry.)
 - 3.14.0:
-    - 3.14.0a1, 3.14.0a1t (The `t` image does not have Poetry, since it does not yet support free-threaded Python.)
+    - 3.14.0a1, 3.14.0a1t (The `t` image does not have Poetry.)
 
 This is pretty much a copy of the official CircleCI image with some small tweaks. CircleCI's source can be found at: https://github.com/CircleCI-Public/cimg-python/
 
-⚠️ Please note that, in some images, `poetry` may be missing. It has several binary dependencies that are sometimes not yet compatible with pre-release versions of Python.
+⚠️ Please note that, in some images, `poetry` may be missing. It has several binary dependencies that are sometimes not yet compatible with pre-release versions of Python or are not yet compatible with free-threaded Python.
 
 
 ## Usage
