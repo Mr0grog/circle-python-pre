@@ -40,7 +40,7 @@ version: 2.1
 jobs:
   test:
     docker:
-      - image: mr0grog/circle-python-pre:3.14.0a2
+      - image: mr0grog/circle-python-pre:3.14.0a3
     steps:
       - checkout
       - run:
