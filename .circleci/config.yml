@@ -25,7 +25,7 @@ workflows:
   ci:
     jobs:
       - smoke_test:
-          version: 3.14.0a2
+          version: 3.14.0a3
       - smoke_test:
           name: smoke_test-freethreading
-          version: 3.14.0a2t
+          version: 3.14.0a3t
