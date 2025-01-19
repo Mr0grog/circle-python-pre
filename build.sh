@@ -17,7 +17,7 @@ echo "=== Building Image for Python ${PYTHON_VERSION} ==="
 platform_and_push='--load'
 if [ "${2}" = 'push' ]; then
     echo '--- Building for multiple platforms and pushing to Docker Hub --'
-    platform_and_push='--output push-by-digest=true,type=image,push=true'
+    platform_and_push="--output 'push-by-digest=true,type=image,push=true'"
 fi
 
 docker context create circle || true
@@ -31,8 +31,24 @@ docker buildx use circle-builder
 # #   https://github.com/multiarch/qemu-user-static/issues/17
 # docker run --rm --privileged multiarch/qemu-user-static --reset -p yes --credential yes
 
+# docker buildx build \
+#     $platform_and_push \
+#     --tag "${IMAGE_NAME}:${PYTHON_VERSION}" \
+#     --build-arg "ARG_PYTHON_VERSION=${PYTHON_VERSION}" \
+#     .
 docker buildx build \
     $platform_and_push \
-    --tag "${IMAGE_NAME}:${PYTHON_VERSION}" \
+    --tag "${IMAGE_NAME}" \
     --build-arg "ARG_PYTHON_VERSION=${PYTHON_VERSION}" \
-    .
+    . \
+    > build-log.txt 2>&1
+
+cat build-log.txt
+
+echo '--- Digest ---'
+IMAGE_DIGEST=$(grep 'exporting manifest list sha256:' build-log.txt | sed -e 's/^.*\(sha256:[0-9a-f]*\).*/\1/')
+echo "IMAGE_DIGEST=${IMAGE_DIGEST}" >> $GITHUB_ENV
+echo "${IMAGE_DIGEST}"
+
+mkdir -p ./digests
+touch "./digests/${IMAGE_DIGEST#sha256:}"
