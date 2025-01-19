@@ -29,16 +29,10 @@ jobs:
           echo 'Running on...'
           uname -a
 
-      # - name: Build and Push
-      #   run: |
-      #     # Enable `sudo` to work inside a multi-architecture Docker build. See:
-      #     #   https://github.com/docker/buildx/issues/1335
-      #     #   https://github.com/multiarch/alpine/issues/32#issuecomment-604521491
-      #     #   https://github.com/multiarch/qemu-user-static/issues/17
-      #     docker run --rm --privileged multiarch/qemu-user-static:register --reset --credential yes
-      #     # Actual build script.
-      #     ./build.sh ${{ matrix.version }} push
+      - name: Build and Push
+        run: |
+          ./build.sh ${{ matrix.version }} push
 
-      # - name: Smoke Test
-      #   run: |
-      #     ./smoke-test.sh ${{ matrix.version }} 'mr0grog/circle-python-pre:${{ matrix.version }}'
+      - name: Smoke Test
+        run: |
+          ./smoke-test.sh ${{ matrix.version }} 'mr0grog/circle-python-pre-test:${{ matrix.version }}'
