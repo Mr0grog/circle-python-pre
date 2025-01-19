@@ -17,7 +17,7 @@ echo "=== Building Image for Python ${PYTHON_VERSION} ==="
 platform_and_push='--load'
 if [ "${2}" = 'push' ]; then
     echo '--- Building for multiple platforms and pushing to Docker Hub --'
-    platform_and_push="--output 'push-by-digest=true,type=image,push=true'"
+    platform_and_push='--output push-by-digest=true,type=image,push=true'
 fi
 
 docker context create circle || true
