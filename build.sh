@@ -36,14 +36,19 @@ docker buildx use circle-builder
 #     --tag "${IMAGE_NAME}:${PYTHON_VERSION}" \
 #     --build-arg "ARG_PYTHON_VERSION=${PYTHON_VERSION}" \
 #     .
-docker buildx build \
+BUILD_ERROR=$(docker buildx build \
     $platform_and_push \
     --tag "${IMAGE_NAME}" \
     --build-arg "ARG_PYTHON_VERSION=${PYTHON_VERSION}" \
     . \
-    > build-log.txt 2>&1
+    > build-log.txt 2>&1 \
+    || echo $?
+)
 
 cat build-log.txt
+if [[ -n "${BUILD_ERROR}" ]]; then
+    exit "${BUILD_ERROR}"
+fi
 
 echo '--- Digest ---'
 IMAGE_DIGEST=$(grep 'exporting manifest list sha256:' build-log.txt | sed -e 's/^.*\(sha256:[0-9a-f]*\).*/\1/')
