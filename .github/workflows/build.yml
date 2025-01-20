@@ -31,7 +31,7 @@ jobs:
       - name: Define Variables
         id: definitions
         run: |
-          echo 'versions=${{ toJSON(fromJSON(inputs.versions || env.VERSIONS)) }}' >> "$GITHUB_OUTPUT"
+          echo 'versions=''${{ inputs.versions || env.VERSIONS }}' >> "$GITHUB_OUTPUT"
 
   build-platform:
     needs: vars
