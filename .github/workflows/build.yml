@@ -145,8 +145,8 @@ jobs:
         working-directory: ${{ runner.temp }}/digests
         run: |
           docker buildx imagetools create \
-            --tag 'mr0grog/circle-python-pre-test:${{ matrix.version }}' \
-            $(printf 'mr0grog/circle-python-pre-test@sha256:%s ' *)
+            --tag '${{ env.IMAGE_NAME }}:${{ matrix.version }}' \
+            $(printf '${{ env.IMAGE_NAME }}@sha256:%s ' *)
 
       - name: Inspect image
         run: |
