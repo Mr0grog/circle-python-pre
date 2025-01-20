@@ -26,12 +26,16 @@ jobs:
   vars:
     runs-on: ubuntu-latest
     outputs:
-      versions: ${{ steps.definitions.outputs.versions }}
+      versions: '${{ inputs.versions || env.VERSIONS }}'
     steps:
-      - name: Define Variables
-        id: definitions
-        run: |
-          echo 'versions=''${{ inputs.versions || env.VERSIONS }}' >> "$GITHUB_OUTPUT"
+      - name: No-op
+        run: echo 'OK'
+    #   versions: ${{ steps.definitions.outputs.versions }}
+    # steps:
+    #   - name: Define Variables
+    #     id: definitions
+    #     run: |
+    #       echo 'versions=''${{ inputs.versions || env.VERSIONS }}' >> "$GITHUB_OUTPUT"
 
   build-platform:
     needs: vars
