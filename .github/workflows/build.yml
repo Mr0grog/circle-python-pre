@@ -1,22 +1,33 @@
+name: Build
+
+env:
+  IMAGE_NAME: mr0grog/circle-python-pre
+  VERSIONS: '["3.14.0a4", "3.14.0a4t"]'
+
 on:
-  push:
+  pull_request:
     paths:
       - "Dockerfile"
-      - "build.sh"
+      - "smoke-test.sh"
+      - ".github/workflows/*.*"
+  push:
+    branches:
+      - main
+    paths:
+      - "Dockerfile"
+      - "smoke-test.sh"
       - ".github/workflows/*.*"
   workflow_dispatch:
     inputs:
+      publish:
+        description: 'Publish to Docker Hub'
+        required: false
+        type: boolean
       versions:
         description: 'Python versions to build (JSON array)'
         required: false
         type: string
         default: ''
-
-name: Build
-
-env:
-  IMAGE_NAME: mr0grog/circle-python-pre-test
-  VERSIONS: '["3.14.0a4", "3.14.0a4t"]'
 
 jobs:
   # Unfortunately, you can't use global `env` variables when defining a job's
@@ -27,22 +38,17 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       versions: '${{ inputs.versions || env.VERSIONS }}'
-    steps:
-      - name: No-op
-        run: echo 'OK'
-    #   versions: ${{ steps.definitions.outputs.versions }}
-    # steps:
-    #   - name: Define Variables
-    #     id: definitions
-    #     run: |
-    #       echo 'versions=''${{ inputs.versions || env.VERSIONS }}' >> "$GITHUB_OUTPUT"
+    # Steps are required, so we have a pointless one here.
+    # More complex variable assignments could be done in the script step, e.g:
+    #   echo 'versions='"<Some fun bash code here>" >> "$GITHUB_OUTPUT"
+    steps: [{ name: "No-op", run: "echo 'OK'" }]
 
   build-platform:
     needs: vars
     strategy:
       matrix:
         platform: ["ubuntu-24.04", "ubuntu-24.04-arm"]
-        version: ${{ fromJSON(needs.vars.outputs.versions) }}  # ["3.14.0a4"] #, "3.14.0a3t"]
+        version: ${{ fromJSON(needs.vars.outputs.versions) }}
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -57,6 +63,20 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build Image
+        id: testbuild
+        uses: docker/build-push-action@v6
+        with:
+          load: true
+          tags: '${{ env.IMAGE_NAME}}:test'
+          build-args: |
+            ARG_PYTHON_VERSION=${{ matrix.version }}
+
+      - name: Smoke Test
+        run: |
+          ./smoke-test.sh ${{ matrix.version }} "${{ env.IMAGE_NAME }}:test"
+
+      - name: Build Image
+        if: ${{ inputs.publish }}
         id: build
         uses: docker/build-push-action@v6
         with:
@@ -64,17 +84,20 @@ jobs:
           build-args: |
             ARG_PYTHON_VERSION=${{ matrix.version }}
 
-      - name: Smoke Test
-        run: |
-          ./smoke-test.sh ${{ matrix.version }} "${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}"
-
+      # Kind of a funky hack to get matrix job outputs to the next job.
+      # Uploaded artifacts can be merged, so we make a directory full of empty
+      # files named for the digests we want as outputs. In the next job, we
+      # merge all the relevant artifacts and list the file names to get the
+      # digests that need to be combined as inputs.
       - name: Export digest
+        if: ${{ inputs.publish }}
         run: |
-          mkdir -p ${{ runner.temp }}/digests
           digest="${{ steps.build.outputs.digest }}"
+          mkdir -p ${{ runner.temp }}/digests
           touch "${{ runner.temp }}/digests/${digest#sha256:}"
 
       - name: Upload digest
+        if: ${{ inputs.publish }}
         uses: actions/upload-artifact@v4
         with:
           name: digests-${{ matrix.version}}-${{ matrix.platform }}
@@ -83,6 +106,7 @@ jobs:
           retention-days: 1
 
   merge:
+    if: ${{ inputs.publish }}
     runs-on: ubuntu-latest
     needs:
       - vars
@@ -91,6 +115,9 @@ jobs:
       matrix:
         version: ${{ fromJSON(needs.vars.outputs.versions) }}
     steps:
+      # Other side of the above hack for for matrix job outputs. This merges
+      # the artifacts from each build job and reads the file names to get the
+      # list of inputs (digests of the docker builds to be merged).
       - name: Download digests
         uses: actions/download-artifact@v4
         with:
