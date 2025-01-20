@@ -16,6 +16,7 @@ name: Build
 
 env:
   IMAGE_NAME: mr0grog/circle-python-pre-test
+  VERSIONS: '["3.14.0a4", "3.14.0a4t"]'
 
 jobs:
   # Unfortunately, you can't use global `env` variables when defining a job's
@@ -30,7 +31,7 @@ jobs:
       - name: Define Variables
         id: definitions
         run: |
-          echo 'versions=${{ toJSON(inputs.versions && fromJSON(inputs.versions) || ["3.14.0a4", "3.14.0a3t"]) }}' >> "$GITHUB_OUTPUT"
+          echo 'versions=${{ toJSON(fromJSON(inputs.versions || env.VERSIONS)) }}' >> "$GITHUB_OUTPUT"
 
   build-platform:
     needs: vars
