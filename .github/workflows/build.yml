@@ -77,7 +77,7 @@ jobs:
 
       - name: Check Poetry Support
         run: |
-          poetry_command=$(docker run "${{ env.IMAGE_NAME }}:test" which poetry)
+          poetry_command=$(docker run "${{ env.IMAGE_NAME }}:test" poetry --version 2> /dev/null || echo '')
           supported='❌ Nope'
           if [[ -n "${poetry_command}" ]]; then supported='✅ Yes!'; fi
           echo "Supports Poetry: ${supported}" >> $GITHUB_STEP_SUMMARY
