@@ -1,0 +1,153 @@
+name: Build
+
+env:
+  IMAGE_NAME: mr0grog/circle-python-pre
+  VERSIONS: '["3.14.0a4", "3.14.0a4t"]'
+
+on:
+  pull_request:
+    paths:
+      - "Dockerfile"
+      - "smoke-test.sh"
+      - ".github/workflows/*.*"
+  push:
+    branches:
+      - main
+    paths:
+      - "Dockerfile"
+      - "smoke-test.sh"
+      - ".github/workflows/*.*"
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish to Docker Hub'
+        required: false
+        type: boolean
+      versions:
+        description: 'Python versions to build (JSON array)'
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  # Unfortunately, you can't use global `env` variables when defining a job's
+  # matrix, but you *can* use the outputs of a previous. This is a ridiculous
+  # hack to set variables for multiple jobs that come after this one. Based on:
+  # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/running-variations-of-jobs-in-a-workflow#example-using-an-output-to-define-two-matrices
+  vars:
+    runs-on: ubuntu-latest
+    outputs:
+      versions: '${{ inputs.versions || env.VERSIONS }}'
+    # Steps are required, so we have a pointless one here.
+    # More complex variable assignments could be done in the script step, e.g:
+    #   echo 'versions='"<Some fun bash code here>" >> "$GITHUB_OUTPUT"
+    steps: [{ name: "No-op", run: "echo 'OK'" }]
+
+  build-platform:
+    needs: vars
+    strategy:
+      matrix:
+        platform: ["ubuntu-24.04", "ubuntu-24.04-arm"]
+        version: ${{ fromJSON(needs.vars.outputs.versions) }}
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Image
+        id: testbuild
+        uses: docker/build-push-action@v6
+        with:
+          load: true
+          tags: '${{ env.IMAGE_NAME}}:test'
+          build-args: |
+            ARG_PYTHON_VERSION=${{ matrix.version }}
+
+      - name: Smoke Test
+        run: |
+          ./smoke-test.sh ${{ matrix.version }} "${{ env.IMAGE_NAME }}:test"
+
+      - name: Check Poetry Support
+        run: |
+          poetry_command=$(docker run "${{ env.IMAGE_NAME }}:test" poetry --version 2> /dev/null || echo '')
+          supported='❌ Nope'
+          if [[ -n "${poetry_command}" ]]; then supported='✅ Yes!'; fi
+          echo "Supports Poetry: ${supported}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Publish Image Digest
+        if: ${{ inputs.publish }}
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          outputs: type=image,"name=${{ env.IMAGE_NAME }}",push-by-digest=true,name-canonical=true,push=true
+          build-args: |
+            ARG_PYTHON_VERSION=${{ matrix.version }}
+
+      # Kind of a funky hack to get matrix job outputs to the next job.
+      # Uploaded artifacts can be merged, so we make a directory full of empty
+      # files named for the digests we want as outputs. In the next job, we
+      # merge all the relevant artifacts and list the file names to get the
+      # digests that need to be combined as inputs.
+      - name: Export digest
+        if: ${{ inputs.publish }}
+        run: |
+          digest="${{ steps.build.outputs.digest }}"
+          mkdir -p ${{ runner.temp }}/digests
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        if: ${{ inputs.publish }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.version}}-${{ matrix.platform }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    if: ${{ inputs.publish }}
+    runs-on: ubuntu-latest
+    needs:
+      - vars
+      - build-platform
+    strategy:
+      matrix:
+        version: ${{ fromJSON(needs.vars.outputs.versions) }}
+    steps:
+      # Other side of the above hack for for matrix job outputs. This merges
+      # the artifacts from each build job and reads the file names to get the
+      # list of inputs (digests of the docker builds to be merged).
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-${{ matrix.version}}-*
+          merge-multiple: true
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Push tag with combined images
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create \
+            --tag 'mr0grog/circle-python-pre-test:${{ matrix.version }}' \
+            $(printf 'mr0grog/circle-python-pre-test@sha256:%s ' *)
+
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect '${{ env.IMAGE_NAME }}:${{ matrix.version }}'
