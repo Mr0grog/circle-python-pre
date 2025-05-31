@@ -2,7 +2,7 @@ name: Build
 
 env:
   IMAGE_NAME: mr0grog/circle-python-pre
-  VERSIONS: '["3.14.0b1", "3.14.0b1t"]'
+  VERSIONS: '["3.14.0b2", "3.14.0b2t"]'
 
 on:
   pull_request:
