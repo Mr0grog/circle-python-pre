@@ -6,6 +6,9 @@ jobs:
       version:
         description: 'Expected version of Python to be used'
         type: string
+      poetry:
+        description: 'Whether to test Poetry support'
+        type: boolean
     docker:
       - image: "mr0grog/circle-python-pre:<< parameters.version >>"
     steps:
@@ -21,11 +24,21 @@ jobs:
           command: |
             pip install --upgrade pip
 
+      - when:
+          condition: << parameters.poetry >>
+          steps:
+            - run:
+                name: Check Poetry
+                command: |
+                  poetry --help
+
 workflows:
   ci:
     jobs:
       - smoke_test:
-          version: 3.14.0rc2
+          version: 3.14.0rc3
+          poetry: true
       - smoke_test:
           name: smoke_test-freethreading
-          version: 3.14.0rc2
+          version: 3.14.0rc3
+          poetry: true
