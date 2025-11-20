@@ -50,11 +50,16 @@ RUN python --version && \
 	pip --version && \
 	pip install --upgrade pip && \
 	pip --version && \
-	# This installs pipenv at the latest version
-	pip install pipenv wheel && \
-	pipenv --version && \
-	# Install pipx
-	pip install --user pipx
+	pip install wheel
+
+# TWEAK: Install pipenv and pipx separately from pip and allow them to fail.
+# They may not be compatible with pre-releases.
+RUN pip install pipenv && \
+	pipenv --version || \
+	echo 'WARNING: pipenv not installable!'
+RUN pip install --user pipx && \
+	pipx --version || \
+	echo 'WARNING: pipx not installable!'
 
 # TWEAK: Poetry relies on some Rust-based packages that do not yet have
 # appropriate wheels, so we need to install Rust first.

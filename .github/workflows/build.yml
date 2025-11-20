@@ -2,7 +2,7 @@ name: Build
 
 env:
   IMAGE_NAME: mr0grog/circle-python-pre
-  VERSIONS: '["3.15.0a1", "3.15.0a1t"]'
+  VERSIONS: '["3.15.0a2", "3.15.0a2t"]'
 
 on:
   pull_request:
@@ -78,10 +78,24 @@ jobs:
 
       - name: Check Poetry Support
         run: |
-          poetry_command=$(docker run "${{ env.IMAGE_NAME }}:test" poetry --version 2> /dev/null || echo '')
+          test_command=$(docker run "${{ env.IMAGE_NAME }}:test" poetry --version 2> /dev/null || echo '')
           supported='❌ Nope'
-          if [[ -n "${poetry_command}" ]]; then supported='✅ Yes!'; fi
+          if [[ -n "${test_command}" ]]; then supported='✅ Yes!'; fi
           echo "Supports Poetry: ${supported}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check pipenv Support
+        run: |
+          test_command=$(docker run "${{ env.IMAGE_NAME }}:test" pipenv --version 2> /dev/null || echo '')
+          supported='❌ Nope'
+          if [[ -n "${test_command}" ]]; then supported='✅ Yes!'; fi
+          echo "Supports pipenv: ${supported}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Check pipx Support
+        run: |
+          test_command=$(docker run "${{ env.IMAGE_NAME }}:test" pipx --version 2> /dev/null || echo '')
+          supported='❌ Nope'
+          if [[ -n "${test_command}" ]]; then supported='✅ Yes!'; fi
+          echo "Supports pipx: ${supported}" >> $GITHUB_STEP_SUMMARY
 
       - name: Publish Image Digest
         if: ${{ inputs.publish }}
