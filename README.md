@@ -41,7 +41,7 @@ CircleCI doesn't make official `cimg/python` images available for Python pre-rel
 
 This is pretty much a copy of the official CircleCI image with some small tweaks. CircleCI's source can be found at: https://github.com/CircleCI-Public/cimg-python/
 
-⚠️ Please note that, in some images, `poetry` may be missing. It has several binary dependencies that are sometimes not yet compatible with pre-release versions of Python or are not yet compatible with free-threaded Python.
+⚠️ Please note that, in some images, tools like `poetry`, `pipenv`, and `pipx` may be missing. They are sometimes not yet compatible with pre-release versions of Python or are not yet compatible with free-threaded Python.
 
 
 ## Usage
