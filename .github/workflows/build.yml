@@ -51,7 +51,7 @@ jobs:
         version: ${{ fromJSON(needs.vars.outputs.versions) }}
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Login to Docker Hub
         if: ${{ inputs.publish }}
