@@ -141,7 +141,7 @@ jobs:
       # the artifacts from each build job and reads the file names to get the
       # list of inputs (digests of the docker builds to be merged).
       - name: Download digests
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           path: ${{ runner.temp }}/digests
           pattern: digests-${{ matrix.version}}-*
