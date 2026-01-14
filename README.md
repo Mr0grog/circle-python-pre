@@ -78,6 +78,6 @@ workflows:
 
 ## License & Copyright
 
-Copyright (C) 2023-2025 Rob Brackett. See the [`LICENSE`](./LICENSE) file for details.
+Copyright (C) 2023-2026 Rob Brackett. See the [`LICENSE`](./LICENSE) file for details.
 
 Most of the Dockerfile is a fork of CircleCI's official image, which is also MIT-licensed: https://github.com/CircleCI-Public/cimg-python/
