@@ -36,9 +36,9 @@ workflows:
   ci:
     jobs:
       - smoke_test:
-          version: 3.15.0a3
+          version: 3.15.0a4
           poetry: true
       - smoke_test:
           name: smoke_test-freethreading
-          version: 3.15.0a3t
+          version: 3.15.0a4t
           poetry: false
