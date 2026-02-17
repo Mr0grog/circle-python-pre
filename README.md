@@ -41,6 +41,7 @@ CircleCI doesn't make official `cimg/python` images available for Python pre-rel
     - 3.15.0a3, 3.15.0a3t (The `t` image does not have Poetry.)
     - 3.15.0a4, 3.15.0a4t (The `t` image does not have Poetry.)
     - 3.15.0a5, 3.15.0a5t (The `t` image does not have Poetry.)
+    - 3.15.0a6, 3.15.0a6t (The `t` image does not have Poetry.)
 
 This is pretty much a copy of the official CircleCI image with some small tweaks. CircleCI's source can be found at: https://github.com/CircleCI-Public/cimg-python/
 
@@ -57,7 +58,7 @@ version: 2.1
 jobs:
   test:
     docker:
-      - image: mr0grog/circle-python-pre:3.15.0a5
+      - image: mr0grog/circle-python-pre:3.15.0a6
     steps:
       - checkout
       - run:
