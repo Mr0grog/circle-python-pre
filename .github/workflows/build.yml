@@ -65,7 +65,7 @@ jobs:
 
       - name: Build Image
         id: testbuild
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           load: true
           tags: '${{ env.IMAGE_NAME}}:test'
@@ -100,7 +100,7 @@ jobs:
       - name: Publish Image Digest
         if: ${{ inputs.publish }}
         id: build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           outputs: type=image,"name=${{ env.IMAGE_NAME }}",push-by-digest=true,name-canonical=true,push=true
           build-args: |
