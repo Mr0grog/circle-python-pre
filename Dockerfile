@@ -5,7 +5,7 @@
 # Care should be taken to keep this inline with that source file.
 # Tweaks here are marked with "# TWEAK:"
 
-FROM cimg/base:2026.03
+FROM cimg/base:2026.04
 
 # TWEAK: custom maintainer
 LABEL maintainer="Rob Brackett (https://github.com/Mr0grog)"
