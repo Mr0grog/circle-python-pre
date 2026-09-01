@@ -49,6 +49,7 @@ CircleCI doesn't make official `cimg/python` images available for Python pre-rel
     - 3.15.0b3, 3.15.0b3t
     - 3.15.0b4, 3.15.0b4t
     - 3.15.0rc1, 3.15.0rc1t
+    - 3.15.0rc2, 3.15.0rc2t
 
 This is pretty much a copy of the official CircleCI image with some small tweaks. CircleCI's source can be found at: https://github.com/CircleCI-Public/cimg-python/
 
@@ -65,7 +66,7 @@ version: 2.1
 jobs:
   test:
     docker:
-      - image: mr0grog/circle-python-pre:3.15.0rc1
+      - image: mr0grog/circle-python-pre:3.15.0rc2
     steps:
       - checkout
       - run:
