@@ -2,58 +2,59 @@
 
 CircleCI doesn't make official `cimg/python` images available for Python pre-releases, so this does. The goal is to make it straightforward to test projects on the beta or release candidate versions of upcoming major Python releases. Available Python versions (versions suffixed with `t` are [“free-threading,” or no GIL](https://py-free-threading.github.io), a new feature in 3.13.0+):
 
-- 3.12.0:
-    - 3.12.0rc3
-    - 3.12.0 (production release)
-- 3.13.0:
-    - (No 3.13.0a1 release)
-    - 3.13.0a2
-    - 3.13.0a3
-    - (No 3.13.0a4 release; Pyenv never supported it)
-    - 3.13.0a5
-    - 3.13.0a6
-    - 3.13.0b1
-    - 3.13.0b2
-    - 3.13.0b3
-    - 3.13.0b4, 3.13.0b4t (The `t` image does not have Poetry.)
-    - 3.13.0rc1, 3.13.0rc1t (The `t` image does not have Poetry.)
-    - 3.13.0rc2, 3.13.0rc2t (The `t` image does not have Poetry.)
-    - 3.13.0rc3, 3.13.0rc3t (The `t` image does not have Poetry.)
-    - 3.13.0, 3.13.0t (production release) (The `t` image does not have Poetry.)
-- 3.14.0:
-    - 3.14.0a1, 3.14.0a1t (The `t` image does not have Poetry.)
-    - 3.14.0a2, 3.14.0a2t (The `t` image does not have Poetry.)
-    - 3.14.0a3, 3.14.0a3t (The `t` image does not have Poetry.)
-    - 3.14.0a4, 3.14.0a4t (The `t` image does not have Poetry.)
-    - 3.14.0a5, 3.14.0a5t (The `t` image does not have Poetry.)
-    - 3.14.0a6, 3.14.0a6t (The `t` image does not have Poetry.)
-    - 3.14.0a7, 3.14.0a7t (The `t` image does not have Poetry.)
-    - 3.14.0b1, 3.14.0b1t (The `t` image does not have Poetry.)
-    - 3.14.0b3, 3.14.0b3t (The `t` image does not have Poetry.)
-    - 3.14.0b4, 3.14.0b4t (The `t` image does not have Poetry.)
-    - 3.14.0rc1, 3.14.0rc1t (The `t` image does not have Poetry.)
-    - 3.14.0rc2, 3.14.0rc2t (The `t` image does not have Poetry.)
-    - 3.14.0rc3, 3.14.0rc3t
-    - 3.14.0, 3.14.0t
-- 3.15.0:
-    - 3.15.0a1, 3.15.0a1t (The `t` image does not have Poetry.)
-    - 3.15.0a2, 3.15.0a2t (Neither image has pipenv, and the `t` image does not have Poetry.)
-    - 3.15.0a3, 3.15.0a3t (The `t` image does not have Poetry.)
-    - 3.15.0a4, 3.15.0a4t (The `t` image does not have Poetry.)
-    - 3.15.0a5, 3.15.0a5t (The `t` image does not have Poetry.)
-    - 3.15.0a6, 3.15.0a6t (The `t` image does not have Poetry.)
-    - 3.15.0a7, 3.15.0a7t (The `t` image does not have Poetry.)
-    - 3.15.0a8, 3.15.0a8t (The `t` image does not have Poetry.)
-    - 3.15.0b1, 3.15.0b1t
-    - 3.15.0b2, 3.15.0b2t
-    - 3.15.0b3, 3.15.0b3t
-    - 3.15.0b4, 3.15.0b4t
-    - 3.15.0rc1, 3.15.0rc1t
-    - 3.15.0rc2, 3.15.0rc2t
-    - 3.15.0rc3, 3.15.0rc3t
-    - 3.15.0, 3.15.0t
+
 - 3.16.0:
     - 3.16.0a1, 3.16.0a1t (Neither image has Poetry.)
+- 3.15.0:
+    - 3.15.0, 3.15.0t (Production release)
+    - 3.15.0rc3, 3.15.0rc3t
+    - 3.15.0rc2, 3.15.0rc2t
+    - 3.15.0rc1, 3.15.0rc1t
+    - 3.15.0b4, 3.15.0b4t
+    - 3.15.0b3, 3.15.0b3t
+    - 3.15.0b2, 3.15.0b2t
+    - 3.15.0b1, 3.15.0b1t
+    - 3.15.0a8, 3.15.0a8t (The `t` image does not have Poetry.)
+    - 3.15.0a7, 3.15.0a7t (The `t` image does not have Poetry.)
+    - 3.15.0a6, 3.15.0a6t (The `t` image does not have Poetry.)
+    - 3.15.0a5, 3.15.0a5t (The `t` image does not have Poetry.)
+    - 3.15.0a4, 3.15.0a4t (The `t` image does not have Poetry.)
+    - 3.15.0a3, 3.15.0a3t (The `t` image does not have Poetry.)
+    - 3.15.0a2, 3.15.0a2t (Neither image has pipenv, and the `t` image does not have Poetry.)
+    - 3.15.0a1, 3.15.0a1t (The `t` image does not have Poetry.)
+- 3.14.0:
+    - 3.14.0, 3.14.0t (Production release)
+    - 3.14.0rc3, 3.14.0rc3t
+    - 3.14.0rc2, 3.14.0rc2t (The `t` image does not have Poetry.)
+    - 3.14.0rc1, 3.14.0rc1t (The `t` image does not have Poetry.)
+    - 3.14.0b4, 3.14.0b4t (The `t` image does not have Poetry.)
+    - 3.14.0b3, 3.14.0b3t (The `t` image does not have Poetry.)
+    - 3.14.0b1, 3.14.0b1t (The `t` image does not have Poetry.)
+    - 3.14.0a7, 3.14.0a7t (The `t` image does not have Poetry.)
+    - 3.14.0a6, 3.14.0a6t (The `t` image does not have Poetry.)
+    - 3.14.0a5, 3.14.0a5t (The `t` image does not have Poetry.)
+    - 3.14.0a4, 3.14.0a4t (The `t` image does not have Poetry.)
+    - 3.14.0a3, 3.14.0a3t (The `t` image does not have Poetry.)
+    - 3.14.0a2, 3.14.0a2t (The `t` image does not have Poetry.)
+    - 3.14.0a1, 3.14.0a1t (The `t` image does not have Poetry.)
+- 3.13.0:
+    - 3.13.0, 3.13.0t (production release) (The `t` image does not have Poetry.)
+    - 3.13.0rc3, 3.13.0rc3t (The `t` image does not have Poetry.)
+    - 3.13.0rc2, 3.13.0rc2t (The `t` image does not have Poetry.)
+    - 3.13.0rc1, 3.13.0rc1t (The `t` image does not have Poetry.)
+    - 3.13.0b4, 3.13.0b4t (The `t` image does not have Poetry.)
+    - 3.13.0b3
+    - 3.13.0b2
+    - 3.13.0b1
+    - 3.13.0a6
+    - 3.13.0a5
+    - (No 3.13.0a4 release; Pyenv never supported it)
+    - 3.13.0a3
+    - 3.13.0a2
+    - (No 3.13.0a1 release)
+- 3.12.0:
+    - 3.12.0 (production release)
+    - 3.12.0rc3
 
 This is pretty much a copy of the official CircleCI image with some small tweaks. CircleCI's source can be found at: https://github.com/CircleCI-Public/cimg-python/
 
