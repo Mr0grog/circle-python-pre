@@ -5,7 +5,7 @@
 # Care should be taken to keep this inline with that source file.
 # Tweaks here are marked with "# TWEAK:"
 
-FROM cimg/base:2026.09-24.04
+FROM cimg/base:2026.10-26.04
 
 # TWEAK: custom maintainer
 LABEL maintainer="Rob Brackett (https://github.com/Mr0grog)"
@@ -24,8 +24,7 @@ RUN sudo apt-get update && sudo apt-get install -y \
 		git \
 		libbz2-dev \
 		liblzma-dev \
-		libncurses5-dev \
-		libncursesw5-dev \
+		libncurses-dev \
 		libreadline-dev \
 		libffi-dev \
 		libsqlite3-dev \
@@ -38,7 +37,9 @@ RUN sudo apt-get update && sudo apt-get install -y \
 		tk-dev \
 		wget \
 		xz-utils \
-		zlib1g-dev && \
+		zlib1g-dev \
+		zstd \
+		libzstd-dev && \
 	curl -sSL "https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer" | bash && \
 	sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
