@@ -97,6 +97,13 @@ jobs:
           if [[ -n "${test_command}" ]]; then supported='✅ Yes!'; fi
           echo "Supports pipx: ${supported}" >> $GITHUB_STEP_SUMMARY
 
+      - name: Check uv Support
+        run: |
+          test_command=$(docker run "${{ env.IMAGE_NAME }}:test" uv --version 2> /dev/null || echo '')
+          supported='❌ Nope'
+          if [[ -n "${test_command}" ]]; then supported='✅ Yes!'; fi
+          echo "Supports uv: ${supported}" >> $GITHUB_STEP_SUMMARY
+
       - name: Publish Image Digest
         if: ${{ inputs.publish }}
         id: build

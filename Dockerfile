@@ -74,5 +74,10 @@ RUN pip install --user pipx && \
 RUN curl -sSL https://install.python-poetry.org | python - --preview \
   || echo 'WARNING: Poetry not installable!'
 
+# This installs uv at the latest version.
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
+  && uv --version \
+  || echo 'WARNING: uv not installable!'
+
 # TWEAK: Circle's checkout step requires the project directory to be empty.
 RUN mv /home/circleci/project/poetry-installer-error*.log /home/circleci/ || true
