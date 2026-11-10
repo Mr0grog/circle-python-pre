@@ -3,6 +3,7 @@
 CircleCI doesn't make official `cimg/python` images available for Python pre-releases, so this does. The goal is to make it straightforward to test projects on the beta or release candidate versions of upcoming major Python releases. Available Python versions (versions suffixed with `t` are [“free-threading,” or no GIL](https://py-free-threading.github.io), a new feature in 3.13.0+):
 
 - 3.16.0:
+    - 3.16.0a2, 3.16.0a2t (Neither image has Poetry.)
     - 3.16.0a1, 3.16.0a1t (Neither image has Poetry.)
 - 3.15.0:
     - 3.15.0, 3.15.0t (Production release)
@@ -70,7 +71,7 @@ version: 2.1
 jobs:
   test:
     docker:
-      - image: mr0grog/circle-python-pre:3.16.0a1
+      - image: mr0grog/circle-python-pre:3.16.0a2
     steps:
       - checkout
       - run:
