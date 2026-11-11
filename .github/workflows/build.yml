@@ -173,3 +173,10 @@ jobs:
       - name: Inspect image
         run: |
           docker buildx imagetools inspect '${{ env.IMAGE_NAME }}:${{ matrix.version }}'
+
+  dockerhub-metadata:
+    needs:
+      - merge
+    if: ${{ inputs.publish }}
+    uses: ./.github/workflows/dockerhub-metadata.yml
+    secrets: inherit
